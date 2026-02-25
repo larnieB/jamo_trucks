@@ -25,6 +25,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const App: React.FC = () => {
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
   const [view, setView] = useState<ViewState>('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -40,6 +41,8 @@ const App: React.FC = () => {
    const [sortBy, setSortBy] = useState('newest');
    const BRAND_ORANGE = '#F28C28';
 
+
+
   // Fetch data on mount
   useEffect(() => {
     fetch('http://localhost:8080/jamo_trucks/jamo_trucks/src/backend/getTrucks.php')
@@ -49,6 +52,12 @@ const App: React.FC = () => {
         setFilteredTrucks(data.slice(0, 12)); // Initial 3x4 limit
       });
   }, []);
+
+  React.useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth < 768);
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
 
   // Filter & Sort Logic
  useEffect(() => {
@@ -98,57 +107,59 @@ const App: React.FC = () => {
         <span style={utilityLink} onClick={() => setIsModalOpen(true)}>Apply to become a driver</span>
         <span style={utilityLink} onClick={() => setView('financing')}>Financing</span>
         <span style={utilityLink}  onClick={() => setShowContactModal(true)}>
-           Contact Us: 0712345678-JAMOH-KE
+           Contact Us: +254 791 790744-JAMOH-KE
         </span>
 
       </div>
 
       {/* 2. MAIN NAVIGATION */}
-      <nav style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '10px 40px',
-        backgroundColor: '#ffffff',
-        borderBottom: `1px solid #ddd`
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <img 
-            src="http://localhost:8080/jamo_trucks/jamo_trucks/src/assets/jamohTruckslogo.png" 
-            alt="Logo" 
-            style={{ width: '120px', height: 'auto' }} // Adjusted for a rectangular brand look
-          />
-          <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#333', textTransform: 'uppercase' }}>
-            Jamoh Trucks <span style={{ color: BRAND_ORANGE }}>Kenya</span>
-          </span>
-        </div>
+     {/* 2. MAIN NAVIGATION */}
+<nav style={{
+  display: 'flex',
+  flexDirection: isMobile ? 'column' : 'row', // Stacks items on mobile
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: isMobile ? '15px' : '10px 40px',
+  backgroundColor: '#ffffff',
+  borderBottom: `1px solid #ddd`,
+  gap: isMobile ? '15px' : '0'
+}}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: isMobile ? 'center' : 'left' }}>
+    <img 
+      src="http://localhost:8080/jamo_trucks/jamo_trucks/src/assets/jamohTruckslogo.png" 
+      alt="Logo" 
+      style={{ width: isMobile ? '100px' : '120px', height: 'auto' }} 
+    />
+    <span style={{ fontSize: isMobile ? '1rem' : '1.2rem', fontWeight: '800', color: '#333', textTransform: 'uppercase' }}>
+      Jamoh Trucks <span style={{ color: BRAND_ORANGE }}>Kenya</span>
+    </span>
+  </div>
 
-        <div style={{ display: 'flex', gap: '25px', alignItems: 'center', fontWeight: '500', color: '#555' }}>
-          <span style={{ cursor: 'pointer' }} onClick={() => setView('home')}>Home</span>
-          
-          <button 
-            onClick={() => setView('list')}
-            style={{ 
-              backgroundColor: '#FFD200', // Yellow search/inventory button like Penske
-              color: '#000', 
-              border: 'none', 
-              padding: '10px 20px', 
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px'
-            }}
-          >
-            🔍 INVENTORY
-          </button>
-        </div>
-      </nav>
+  <div style={{ 
+    display: 'flex', 
+    gap: isMobile ? '15px' : '25px', 
+    alignItems: 'center', 
+    fontWeight: '500', 
+    color: '#555' 
+  }}>
+    <span style={{ cursor: 'pointer' }} onClick={() => setView('home')}>Home</span>
+    <button 
+      onClick={() => setView('list')}
+      style={{ 
+        backgroundColor: '#FFD200', 
+        color: '#000', 
+        border: 'none', 
+        padding: '10px 20px', 
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        fontSize: isMobile ? '12px' : '14px'
+      }}
+    >
+      🔍 INVENTORY
+    </button>
+  </div>
+</nav>
 
-      {/* 3. BREADCRUMBS */}
-      <div style={{ padding: '15px 40px', backgroundColor: '#f9f9f9', fontSize: '14px', color: '#00447C' }}>
-  🏠 &gt; Truck Types &gt; <strong>Heavy Duty Trucks</strong>
-</div>
 
       {view === 'home' && (
         <>
@@ -160,11 +171,16 @@ const App: React.FC = () => {
           </div>
 
           {/* 3. MAIN CONTENT AREA (Sidebar + Grid) */}
-          <div style={{ display: 'flex', maxWidth: '1300px', margin: '0 auto', padding: '40px 20px', gap: '30px' }}>
-            
+<div style={{ 
+  display: 'flex', 
+  flexDirection: isMobile ? 'column' : 'row', // Stacks sidebar on top of grid on mobile
+  maxWidth: '1300px', 
+  margin: '0 auto', 
+  padding: isMobile ? '20px 15px' : '40px 20px', 
+  gap: isMobile ? '20px' : '30px' 
+}}>            
             {/* LEFT SIDEBAR FILTER */}
-           <aside style={{ width: '280px', flexShrink: 0 }}>
-              <div style={filterCard}>
+<aside style={{ width: isMobile ? '100%' : '280px', flexShrink: 0 }}>              <div style={filterCard}>
                 <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '10px', marginTop: 0 }}>Refine Search</h3>
                 
                 <div style={filterGroup}>
@@ -238,7 +254,7 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div style={homepageGrid}>
+              <div style={getHomepageGridStyle(isMobile)}>
                 {filteredTrucks.map(truck => (
                   <div key={truck.id} style={miniCard}>
                     <div style={miniImageContainer}>
@@ -326,11 +342,11 @@ const inventoryBtnStyle: React.CSSProperties = {
   cursor: 'pointer'
 };
 
-const homepageGrid: React.CSSProperties = {
+const getHomepageGridStyle = (isMobile: boolean): React.CSSProperties => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)', // Strict 3-column layout
+  gridTemplateColumns: isMobile ? 'repeat(auto-fit, minmax(280px, 1fr))' : 'repeat(3, 1fr)',
   gap: '20px',
-};
+});
 
 const miniCard: React.CSSProperties = {
   backgroundColor: '#fff',

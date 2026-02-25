@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-interface TruckModalProps {
+interface DriverModalProps {
   onClose: () => void;
 }
-
 
 const convertToWebP = (file: File): Promise<Blob> => {
   return new Promise((resolve, reject) => {
@@ -18,8 +17,6 @@ const convertToWebP = (file: File): Promise<Blob> => {
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0);
-        
-        // Quality set to 0.8 (80%) for best balance of size and clarity
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
           else reject(new Error('Canvas toBlob failed'));
@@ -30,275 +27,181 @@ const convertToWebP = (file: File): Promise<Blob> => {
   });
 };
 
-const DriverModal: React.FC<TruckModalProps> = ({  onClose }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [images, setImages] = useState<File[]>([]); // New state for images
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // New: for UI previews
-    const [formData, setFormData] = useState({
-    numberPlate: '',
-    make: '',
-    model: '',
-    year: '',
-    price: '',
-    color: '',
-    location: '',
-    condition: 'New',
-    paymentMethod: 'Cash',
-    deposit: '',
-    bankBalance: '',
-    monthlyInstallments: ''
+const DriverModal: React.FC<DriverModalProps> = ({ onClose }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    email: '',
+    licenseClass: 'BCE',
+    experienceYears: '',
+    currentLocation: '',
+    expectedSalary: '',
+    availability: 'Immediate'
   });
 
   const resetForm = () => {
-  setFormData({
-    numberPlate: '',
-    make: '',
-    model: '',
-    year: '',
-    price: '',
-    color: '',
-    location: '',
-    condition: 'New',
-    paymentMethod: 'Cash',
-    deposit: '',
-    bankBalance: '',
-    monthlyInstallments: ''
-  });
-  setImages([]);
-  setImagePreviews([]);
-};
-  // Cleanup blob URLs to prevent memory leaks
+    setFormData({
+      fullName: '',
+      phoneNumber: '',
+      email: '',
+      licenseClass: 'BCE',
+      experienceYears: '',
+      currentLocation: '',
+      expectedSalary: '',
+      availability: 'Immediate'
+    });
+    setImages([]);
+    setImagePreviews([]);
+  };
+
   useEffect(() => {
     return () => imagePreviews.forEach(url => URL.revokeObjectURL(url));
   }, [imagePreviews]);
-
- 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      
-      // 1. Ensure they are only images (additional JS-side check)
-      const validImages = selectedFiles.filter(file => file.type.startsWith('image/'));
-      
-      setImages(validImages);
-
-      // 2. Generate preview URLs
-      const previewUrls = validImages.map(file => URL.createObjectURL(file));
+      const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+      setImages(selectedFiles);
+      const previewUrls = selectedFiles.map(file => URL.createObjectURL(file));
       setImagePreviews(previewUrls);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-  // --- 1. VALIDATION ---
-  const inputYear = parseInt(formData.year, 10);
-  const currentYear = new Date().getFullYear();
-  if (inputYear > currentYear || inputYear < 1900) {
-    alert("Please enter a valid year.");
-    setIsLoading(false);
-    return;
-  }
-
-  try {
-    // --- 2. WEBP CONVERSION ---
-    // Convert all selected images to WebP Blobs
-    const webpBlobs = await Promise.all(images.map(file => convertToWebP(file)));
-
-    // --- 3. PAYLOAD CREATION ---
-    const data = new FormData();
-    
-    // Append text fields
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
-    
-    // Append WebP Blobs as files
-    webpBlobs.forEach((blob, index) => {
-      data.append(`images[]`, blob, `image_${index}.webp`);
-    });
-
-    // --- 4. SUBMISSION ---
-    const response = await fetch('http://localhost:8080/jamo_trucks_admin/jamo_trucks_admin/src/backend/addTruck.php', {
-      method: 'POST',
-      headers: { "ngrok-skip-browser-warning": "true" },
-      body: data,
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
+    try {
+      const webpBlobs = await Promise.all(images.map(file => convertToWebP(file)));
+      const data = new FormData();
       
-      alert("Truck added successfully!");
-      resetForm();
-      onClose();
-    } else {
-      alert(`Error: ${result.message || 'Failed to save truck'}`);
+      // Append driver details
+      Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+      
+      // Append profile photos/license scans
+      webpBlobs.forEach((blob, index) => {
+        data.append(`documents[]`, blob, `doc_${index}.webp`);
+      });
+
+      // UPDATE THIS URL to your driver registration endpoint
+      const response = await fetch('http://localhost:8080/jamo_trucks_admin/src/backend/addDriver.php', {
+        method: 'POST',
+        headers: { "ngrok-skip-browser-warning": "true" },
+        body: data,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        alert("Registration submitted successfully!");
+        resetForm();
+        onClose();
+      } else {
+        alert(`Error: ${result.message || 'Failed to register'}`);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("An error occurred during submission.");
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("Submission error:", error);
-    alert("An error occurred during conversion or upload.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-const showLoanFields = formData.paymentMethod === 'Finance' || formData.paymentMethod === 'skumaLoan';
+  };
+
   return (
     <div style={modalOverlayStyle}>
       <div style={modalContentStyle}>
-        <h2>Add New Truck</h2>
+        <h2 style={{ borderBottom: '2px solid #F28C28', paddingBottom: '10px' }}>Driver Registration</h2>
+        <p style={{ fontSize: '13px', color: '#666' }}>Fill in your details to be found by truck owners.</p>
+        
         <form onSubmit={handleSubmit} style={formStyle}>
+          <input name="fullName" placeholder="Full Name" onChange={handleChange} required style={inputStyle} />
+          <input name="phoneNumber" placeholder="Phone Number" onChange={handleChange} required style={inputStyle} />
+          <input name="email" type="email" placeholder="Email Address" onChange={handleChange} style={inputStyle} />
           
-          <input name="numberPlate" placeholder="Number Plate" onChange={handleChange} required />
-          <input name="make" placeholder="Make (e.g. Volvo, Scania)" onChange={handleChange} required />
-          <input name="model" placeholder="Model" onChange={handleChange} required />
-          <input name="year" type="number" placeholder="Year" onChange={handleChange} />
-          <input name="price" type="number" placeholder="Price" onChange={handleChange} required />
-          <input name="location" placeholder="location" onChange={handleChange} />
-          <input name="color" placeholder="Color" onChange={handleChange} />
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>License Class:</label>
+              <select name="licenseClass" onChange={handleChange} style={inputStyle}>
+                <option value="BCE">BCE (Heavy Commercial)</option>
+                <option value="CE">CE (Trailer/Articulated)</option>
+                <option value="D">D (Light Vehicle)</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Experience (Yrs):</label>
+              <input name="experienceYears" type="number" placeholder="Years" onChange={handleChange} required style={inputStyle} />
+            </div>
+          </div>
 
-          <label>Truck Images:</label>
-          <input 
-            type="file" 
-            multiple 
-            accept="image/*" 
-            onChange={handleFileChange} 
-          />
+          <input name="currentLocation" placeholder="Current Location (e.g. Mombasa)" onChange={handleChange} required style={inputStyle} />
+          <input name="expectedSalary" type="number" placeholder="Expected Monthly Salary (KES)" onChange={handleChange} style={inputStyle} />
 
-          {/* PREVIEW SECTION */}
+          <label style={labelStyle}>Profile Photo / License Document:</label>
+          <input type="file" multiple accept="image/*" onChange={handleFileChange} />
+
           {imagePreviews.length > 0 && (
             <div style={previewGridStyle}>
               {imagePreviews.map((url, index) => (
                 <div key={index} style={previewSquareStyle}>
-                  <img src={url} alt="preview" style={imgFillStyle} />
+                  <img src={url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>
           )}
 
-          <label>Condition:</label>
-          <select name="condition" onChange={handleChange}>
-            <option value="New">New</option>
-            <option value="Used">Used</option>
-            <option value="Refurbished">Refurbished</option>
-          </select>
-
-          <label>Payment Method:</label>
-          <select name="paymentMethod" onChange={handleChange}>
-            <option value="Cash">Cash</option>
-            <option value="Finance">Finance</option>
-            <option value="skumaLoan">Skuma Loan</option>
-          </select>
-
-          {/* --- CONDITIONAL FIELDS --- */}
-          {showLoanFields && (
-            <div style={loanFieldsContainer}>
-              <h4 style={{ margin: '5px 0' }}>Loan Details</h4>
-              <input 
-                name="deposit" 
-                type="number" 
-                placeholder="Deposit Amount" 
-                value={formData.deposit} 
-                onChange={handleChange} 
-                required 
-              />
-              <input 
-                name="bankBalance" 
-                type="number" 
-                placeholder="Bank Balance Required" 
-                value={formData.bankBalance} 
-                onChange={handleChange} 
-                required 
-              />
-              <input 
-                name="monthlyInstallments" 
-                type="number" 
-                placeholder="Monthly Installments" 
-                value={formData.monthlyInstallments} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-          )}
-
           <div style={buttonContainer}>
-            <button type="submit">Save Truck</button>
-<button type="button" onClick={() => { resetForm(); onClose(); }}>
-  Cancel
-</button>          </div>
+            <button type="submit" style={submitBtnStyle} disabled={isLoading}>
+              {isLoading ? 'Processing...' : 'Register Now'}
+            </button>
+            <button type="button" onClick={() => { resetForm(); onClose(); }} style={cancelBtnStyle}>
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 };
 
-const loanFieldsContainer: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-  padding: '10px',
-  backgroundColor: '#f9f9f9',
-  borderLeft: '4px solid #007bff',
-  borderRadius: '4px'
-};
-
-const previewGridStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(4, 1fr)',
-  gap: '8px',
-  marginTop: '10px',
-  maxHeight: '150px',
-  overflowY: 'auto',
-  padding: '5px',
-  border: '1px solid #eee',
-  borderRadius: '4px'
-};
-
-const previewSquareStyle: React.CSSProperties = {
-  width: '100%',
-  aspectRatio: '1/1',
-  borderRadius: '4px',
-  overflow: 'hidden',
-  backgroundColor: '#f0f0f0',
-  border: '1px solid #ddd'
-};
-
-const imgFillStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover'
-};
-
-const saveButtonStyle: React.CSSProperties = {
-    padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'
-};
-
-const cancelButtonStyle: React.CSSProperties = {
-    padding: '10px', backgroundColor: '#ccc', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer'
-};
-
-// Simple inline styles for structure
+// --- STYLES ---
 const modalOverlayStyle: React.CSSProperties = {
   position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-  backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center'
+  backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
 };
 
 const modalContentStyle: React.CSSProperties = {
-  background: 'white', padding: '20px', borderRadius: '8px', width: '400px', color: 'black'
+  background: 'white', padding: '30px', borderRadius: '12px', width: '450px', maxHeight: '90vh', overflowY: 'auto'
 };
 
-const formStyle: React.CSSProperties = {
-  display: 'flex', flexDirection: 'column', gap: '10px'
+const formStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '15px' };
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', boxSizing: 'border-box'
 };
 
-const buttonContainer: React.CSSProperties = {
-  display: 'flex', justifyContent: 'space-between', marginTop: '15px'
+const labelStyle: React.CSSProperties = { fontSize: '12px', fontWeight: 'bold', color: '#555', marginBottom: '4px', display: 'block' };
+
+const previewGridStyle: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '10px' };
+
+const previewSquareStyle: React.CSSProperties = { width: '100%', aspectRatio: '1/1', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' };
+
+const buttonContainer: React.CSSProperties = { display: 'flex', gap: '10px', marginTop: '20px' };
+
+const submitBtnStyle: React.CSSProperties = {
+  flex: 2, padding: '12px', backgroundColor: '#F28C28', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer'
+};
+
+const cancelBtnStyle: React.CSSProperties = {
+  flex: 1, padding: '12px', backgroundColor: '#eee', color: '#333', border: 'none', borderRadius: '6px', cursor: 'pointer'
 };
 
 export default DriverModal;

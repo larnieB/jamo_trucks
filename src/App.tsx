@@ -95,7 +95,7 @@ const App: React.FC = () => {
       {/* 1. TOP UTILITY BAR (Matches the thin dark bar in screenshot) */}
       <div style={{ backgroundColor: '#222', color: '#fff', padding: '8px 40px', fontSize: '12px', display: 'flex', justifyContent: 'flex-end', gap: '20px' }}>
        <span style={utilityLink}  onClick={() => setView('drivers')}>find a driver</span>
-        <span style={utilityLink}>Apply to become a driver</span>
+        <span style={utilityLink} onClick={() => setIsModalOpen(true)}>Apply to become a driver</span>
         <span style={utilityLink} onClick={() => setView('financing')}>Financing</span>
         <span style={utilityLink}  onClick={() => setShowContactModal(true)}>
            Contact Us: 0712345678-JAMOH-KE
@@ -275,8 +275,7 @@ const App: React.FC = () => {
   
   {view === 'financing' && <Financing />}
 
-        <DriverModal  onClose={() => setIsModalOpen(false)} />
-
+{isModalOpen && <DriverModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 };

@@ -93,7 +93,7 @@ const DriverModal: React.FC<DriverModalProps> = ({ onClose }) => {
       });
 
       // UPDATE THIS URL to your driver registration endpoint
-      const response = await fetch('http://localhost:8080/jamo_trucks_admin/src/backend/addDriver.php', {
+      const response = await fetch('http://localhost:8080/jamo_trucks/jamo_trucks/src/backend/addDriver.php', {
         method: 'POST',
         headers: { "ngrok-skip-browser-warning": "true" },
         body: data,

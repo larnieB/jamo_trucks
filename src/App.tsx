@@ -28,7 +28,6 @@ const App: React.FC = () => {
   const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
   const [view, setView] = useState<ViewState>('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showContactModal, setShowContactModal] = useState(false);
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [filteredTrucks, setFilteredTrucks] = useState<Truck[]>([]);
   const [filters, setFilters] = useState({
@@ -106,7 +105,7 @@ const App: React.FC = () => {
        <span style={utilityLink}  onClick={() => setView('drivers')}>find a driver</span>
         <span style={utilityLink} onClick={() => setIsModalOpen(true)}>Apply to become a driver</span>
         <span style={utilityLink} onClick={() => setView('financing')}>Financing</span>
-        <span style={utilityLink}  onClick={() => setShowContactModal(true)}>
+        <span style={utilityLink} >
            Contact Us: +254 791 790744-JAMOH-KE
         </span>
 
@@ -333,14 +332,7 @@ const resetBtn: React.CSSProperties = {
   marginTop: '10px'
 };
 
-const inventoryBtnStyle: React.CSSProperties = {
-  backgroundColor: '#FFD200',
-  color: '#000',
-  border: 'none',
-  padding: '10px 20px',
-  fontWeight: 'bold',
-  cursor: 'pointer'
-};
+
 
 const getHomepageGridStyle = (isMobile: boolean): React.CSSProperties => ({
   display: 'grid',
@@ -417,7 +409,6 @@ const viewAllBtn: React.CSSProperties = {
 
 // ... Utility styles from previous code
 const imgStyle: React.CSSProperties = { width: '100%', height: '100%', objectFit: 'cover' };
-const contactBtn: React.CSSProperties = { width: '100%', padding: '12px', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' };
 const heroSlantWhite: React.CSSProperties = { position: 'absolute', bottom: 0, left: 0, width: '100%', height: '80px', backgroundColor: '#f4f4f4', clipPath: 'polygon(0 100%, 100% 100%, 100% 0)', zIndex: 1 };
 const heroSlantYellow: React.CSSProperties = { position: 'absolute', bottom: 0, right: 0, width: '50%', height: '100px', backgroundColor: '#FFD200', clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)', zIndex: 0, opacity: 0.6 };
 

@@ -466,26 +466,7 @@ const labelStyle: React.CSSProperties = {
   fontSize: '0.75rem'
 };
 
-const financeGrid: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr 1fr',
-  gap: '10px',
-  width: '100%',
-  alignItems: 'center'
-};
 
-const financeItem: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2px'
-};
-
-const financeValue: React.CSSProperties = {
-  fontSize: '0.9rem',
-  fontWeight: 700,
-  color: '#111827',
-  whiteSpace: 'nowrap'
-};
 
 // ... (Rest of your existing styles below)
 const pageWrapper: React.CSSProperties = { maxWidth: '1200px', margin: '0 auto', padding: '40px 20px', fontFamily: 'system-ui, -apple-system, sans-serif' };

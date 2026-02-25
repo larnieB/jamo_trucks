@@ -25,6 +25,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const App: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
   const [view, setView] = useState<ViewState>('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,6 +40,21 @@ const App: React.FC = () => {
   }); 
    const [sortBy, setSortBy] = useState('newest');
    const BRAND_ORANGE = '#F28C28';
+
+   const carouselImages = [
+  "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=1600", // Truck on highway
+  "https://images.unsplash.com/photo-1586191582151-f73972d107c4?auto=format&fit=crop&q=80&w=1600", // Fleet of trucks
+  "https://images.unsplash.com/photo-1591768793355-74d758169956?auto=format&fit=crop&q=80&w=1600"  // Dashboard/Modern truck
+];
+
+useEffect(() => {
+  if (view === 'home') {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
+    }, 5000); // Slide every 5 seconds
+    return () => clearInterval(timer);
+  }
+}, [view]);
 
 
 
@@ -113,61 +129,154 @@ const App: React.FC = () => {
 
       {/* 2. MAIN NAVIGATION */}
      {/* 2. MAIN NAVIGATION */}
+{/* 2. MAIN NAVIGATION */}
 <nav style={{
-  display: 'flex',
-  flexDirection: isMobile ? 'column' : 'row', // Stacks items on mobile
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: isMobile ? '15px' : '10px 40px',
-  backgroundColor: '#ffffff',
-  borderBottom: `1px solid #ddd`,
-  gap: isMobile ? '15px' : '0'
+  position: 'sticky',
+  top: 0,
+  zIndex: 1000,
+  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+  backdropFilter: 'blur(10px)',
+  boxShadow: '0 2px 15px rgba(0,0,0,0.08)',
+  borderBottom: `3px solid ${BRAND_ORANGE}`,
 }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: isMobile ? 'center' : 'left' }}>
-    <img 
-      src="http://localhost:8080/jamo_trucks/jamo_trucks/src/assets/jamohTruckslogo.png" 
-      alt="Logo" 
-      style={{ width: isMobile ? '100px' : '120px', height: 'auto' }} 
-    />
-    <span style={{ fontSize: isMobile ? '1rem' : '1.2rem', fontWeight: '800', color: '#333', textTransform: 'uppercase' }}>
-      Jamoh Trucks <span style={{ color: BRAND_ORANGE }}>Kenya</span>
-    </span>
-  </div>
-
-  <div style={{ 
-    display: 'flex', 
-    gap: isMobile ? '15px' : '25px', 
-    alignItems: 'center', 
-    fontWeight: '500', 
-    color: '#555' 
+  <div style={{
+    display: 'flex',
+    flexDirection: isMobile ? 'column' : 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    maxWidth: '1300px',
+    margin: '0 auto',
+    padding: isMobile ? '15px' : '12px 40px',
+    gap: isMobile ? '15px' : '0'
   }}>
-    <span style={{ cursor: 'pointer' }} onClick={() => setView('home')}>Home</span>
-    <button 
-      onClick={() => setView('list')}
-      style={{ 
-        backgroundColor: '#FFD200', 
-        color: '#000', 
-        border: 'none', 
-        padding: '10px 20px', 
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        fontSize: isMobile ? '12px' : '14px'
-      }}
+    {/* Logo Section */}
+    <div 
+      style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+      onClick={() => setView('home')}
     >
-      🔍 INVENTORY
-    </button>
+      <img 
+        src="http://localhost:8080/jamo_trucks/jamo_trucks/src/assets/jamohTruckslogo.png" 
+        alt="Logo" 
+        style={{ width: isMobile ? '80px' : '100px', height: 'auto', objectFit: 'contain' }} 
+      />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span style={{ 
+          fontSize: isMobile ? '1.1rem' : '1.4rem', 
+          fontWeight: '900', 
+          color: '#1a1a1a', 
+          textTransform: 'uppercase',
+          letterSpacing: '-0.5px',
+          lineHeight: 1 
+        }}>
+          Jamoh Trucks
+        </span>
+        <span style={{ 
+          color: BRAND_ORANGE, 
+          fontSize: '0.75rem', 
+          fontWeight: '700', 
+          textTransform: 'uppercase', 
+          letterSpacing: '2px' 
+        }}>
+          sellers Kenya
+        </span>
+      </div>
+    </div>
+
+    {/* Menu Items */}
+    <div style={{ 
+      display: 'flex', 
+      gap: isMobile ? '20px' : '35px', 
+      alignItems: 'center',
+    }}>
+      <span 
+        onClick={() => setView('home')}
+        style={view === 'home' ? activeNavLink : navLink}
+      >
+        Home
+      </span>
+      <span 
+        onClick={() => setView('drivers')}
+        style={view === 'drivers' ? activeNavLink : navLink}
+      >
+        Drivers
+      </span>
+     
+      
+      <button 
+        onClick={() => setView('list')}
+        style={{ 
+          backgroundColor: '#1a1a1a', 
+          color: '#fff', 
+          border: 'none', 
+          padding: isMobile ? '10px 18px' : '12px 24px', 
+          fontWeight: '800',
+          cursor: 'pointer',
+          fontSize: isMobile ? '12px' : '13px',
+          borderRadius: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = BRAND_ORANGE)}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1a1a1a')}
+      >
+        <span style={{ color: BRAND_ORANGE }}>●</span> VIEW INVENTORY
+      </button>
+    </div>
   </div>
 </nav>
 
 
       {view === 'home' && (
-        <>
-          {/* 2. HERO SECTION */}
-          <div style={{ height: '350px', backgroundColor: BRAND_ORANGE, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', overflow: 'hidden' }}>
-            <h1 style={{ fontSize: '3rem', zIndex: 2 }}>Premium Heavy Duty Trucks</h1>
-            <div style={heroSlantWhite}></div>
-            <div style={heroSlantYellow}></div>
-          </div>
+  <>
+    <div style={heroContainer}>
+      {/* Background Images */}
+      {carouselImages.map((img, index) => (
+        <div
+          key={index}
+          style={{
+            ...heroSlide,
+            backgroundImage: `url(${img})`,
+            opacity: currentSlide === index ? 1 : 0,
+          }}
+        />
+      ))}
+
+      {/* Modern Overlay Gradient */}
+      <div style={heroOverlay}></div>
+
+      {/* Content */}
+      <div style={heroContent}>
+        <h1 style={heroTitle}>
+          Premium Heavy Duty <span style={{ color: '#F28C28' }}>Trucks</span>
+        </h1>
+        <p style={heroSubtitle}>
+          Reliable transport solutions for the Kenyan terrain. 
+          New arrivals weekly in Nairobi & Mombasa.
+        </p>
+        <div style={{ display: 'flex', gap: '15px', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+          <button onClick={() => setView('list')} style={heroPrimaryBtn}>View Inventory</button>
+          <button style={heroSecondaryBtn}>Get Financing</button>
+        </div>
+      </div>
+
+      {/* Carousel Dots */}
+      <div style={dotContainer}>
+        {carouselImages.map((_, i) => (
+          <div
+            key={i}
+            onClick={() => setCurrentSlide(i)}
+            style={{
+              ...dot,
+              backgroundColor: currentSlide === i ? '#F28C28' : 'rgba(255,255,255,0.5)',
+              width: currentSlide === i ? '30px' : '10px',
+            }}
+          />
+        ))}
+      </div>
+    </div>
 
           {/* 3. MAIN CONTENT AREA (Sidebar + Grid) */}
 <div style={{ 
@@ -180,7 +289,7 @@ const App: React.FC = () => {
 }}>            
             {/* LEFT SIDEBAR FILTER */}
 <aside style={{ width: isMobile ? '100%' : '280px', flexShrink: 0 }}>              <div style={filterCard}>
-                <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '10px', marginTop: 0 }}>Refine Search</h3>
+                <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '10px', marginTop: 0 }}> find your truck</h3>
                 
                 <div style={filterGroup}>
                   <label style={filterLabel}>Brand</label>
@@ -298,7 +407,123 @@ const App: React.FC = () => {
 // --- STYLES ---
 const utilityLink: React.CSSProperties = { 
   cursor: 'pointer', 
-  textDecoration: 'none' 
+  textDecoration: 'none',
+  transition: 'color 0.2s',
+  opacity: 0.8,
+};
+
+const navLink: React.CSSProperties = {
+  cursor: 'pointer',
+  fontSize: '14px',
+  fontWeight: '700',
+  color: '#444',
+  textTransform: 'uppercase',
+  position: 'relative',
+  transition: 'color 0.3s'
+};
+
+const activeNavLink: React.CSSProperties = {
+  ...navLink,
+  color: '#F28C28',
+};
+
+const heroContainer: React.CSSProperties = {
+  height: '500px',
+  width: '100%',
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  overflow: 'hidden',
+  backgroundColor: '#000',
+};
+
+const heroSlide: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  transition: 'opacity 1s ease-in-out',
+  zIndex: 0,
+};
+
+const heroOverlay: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  background: 'linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%)',
+  zIndex: 1,
+};
+
+const heroContent: React.CSSProperties = {
+  position: 'relative',
+  zIndex: 2,
+  maxWidth: '1300px',
+  margin: '0 auto',
+  padding: '0 40px',
+  width: '100%',
+  color: 'white',
+};
+
+const heroTitle: React.CSSProperties = {
+  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+  fontWeight: '800',
+  margin: '0 0 15px 0',
+  lineHeight: '1.1',
+  textTransform: 'uppercase',
+  letterSpacing: '-1px',
+};
+
+const heroSubtitle: React.CSSProperties = {
+  fontSize: '1.2rem',
+  maxWidth: '600px',
+  marginBottom: '30px',
+  opacity: 0.9,
+  lineHeight: '1.6',
+};
+
+const heroPrimaryBtn: React.CSSProperties = {
+  padding: '15px 35px',
+  backgroundColor: '#F28C28',
+  color: '#000',
+  border: 'none',
+  borderRadius: '4px',
+  fontWeight: 'bold',
+  fontSize: '16px',
+  cursor: 'pointer',
+  transition: 'transform 0.2s',
+};
+
+const heroSecondaryBtn: React.CSSProperties = {
+  padding: '15px 35px',
+  backgroundColor: 'transparent',
+  color: '#fff',
+  border: '2px solid #fff',
+  borderRadius: '4px',
+  fontWeight: 'bold',
+  fontSize: '16px',
+  cursor: 'pointer',
+};
+
+const dotContainer: React.CSSProperties = {
+  position: 'absolute',
+  bottom: '30px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  display: 'flex',
+  gap: '10px',
+  zIndex: 3,
+};
+
+const dot: React.CSSProperties = {
+  height: '10px',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
 };
 
 

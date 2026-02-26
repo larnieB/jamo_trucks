@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TruckCard from '../components/TruckCard';
 
 interface Truck {
   id: number;
@@ -71,6 +72,7 @@ return () => {
     style={cardStyle} 
     onClick={() => setSelectedTruck(truck)}
     role="button"
+    data-aos="fade-up"
   >
     <div style={imageContainer}>
       {truck.images && truck.images.length > 0 ? (

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css'; // Import AOS styles
 import TruckList from './views/TruckList';
 import Drivers from './views/Drivers';
 import DriverModal from './components/DriverModal';
 import Financing from './views/Financing'; // Keep your existing full view
+import TruckCard from './components/TruckCard';
 
 // --- TYPES ---
 interface Truck {
@@ -46,6 +49,15 @@ const App: React.FC = () => {
   "https://images.unsplash.com/photo-1586191582151-f73972d107c4?auto=format&fit=crop&q=80&w=1600", // Fleet of trucks
   "https://images.unsplash.com/photo-1591768793355-74d758169956?auto=format&fit=crop&q=80&w=1600"  // Dashboard/Modern truck
 ];
+
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000, // Animation duration in milliseconds
+      once: false,     // Whether animation should happen only once - while scrolling down
+      easing: 'ease-in-out',
+    });
+  }, []);
 
 useEffect(() => {
   if (view === 'home') {
@@ -288,7 +300,7 @@ useEffect(() => {
   gap: isMobile ? '20px' : '30px' 
 }}>            
             {/* LEFT SIDEBAR FILTER */}
-<aside style={{ width: isMobile ? '100%' : '280px', flexShrink: 0 }}>              <div style={filterCard}>
+<aside style={{ width: isMobile ? '100%' : '280px', flexShrink: 0 }} data-aos="fade-right">              <div style={filterCard}>
                 <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '10px', marginTop: 0 }}> find your truck</h3>
                 
                 <div style={filterGroup}>
@@ -362,27 +374,21 @@ useEffect(() => {
                 </div>
               </div>
 
-              <div style={getHomepageGridStyle(isMobile)}>
-                {filteredTrucks.map(truck => (
-                  <div key={truck.id} style={miniCard}>
-                    <div style={miniImageContainer}>
-                      <img src={`${BASE_URL}${truck.images[0]}`} alt={truck.model} style={imgStyle} />
-                      <div style={miniBadge}>{truck.truck_condition}</div>
-                    </div>
-                    <div style={{ padding: '15px' }}>
-                      <h4 style={{ margin: '0 0 5px 0' }}>{truck.make} {truck.model}</h4>
-                      <p style={{ color: '#666', fontSize: '12px', margin: '0 0 10px 0' }}>{truck.year} • {truck.location}</p>
-                      
-                      <div style={{ borderTop: '1px solid #eee', paddingTop: '10px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#059669' }}>
-                          KES {parseFloat(truck.price).toLocaleString()}
-                        </span>
-                        <div style={{ fontSize: '11px', color: '#999' }}>Deposit: KES {parseFloat(truck.deposit).toLocaleString()}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              
+<div style={getHomepageGridStyle(isMobile)}>
+  {filteredTrucks.map(truck => (
+    <TruckCard 
+      key={truck.id} 
+      truck={truck} 
+      baseUrl={BASE_URL} 
+      onClick={() => {
+        // Since home doesn't have a modal, you can redirect to list 
+        // or set a selected truck state if you add a modal to App.tsx
+        setView('list'); 
+      }} 
+    />
+  ))}
+</div>
               
               <button 
                 onClick={() => setView('list')}

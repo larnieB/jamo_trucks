@@ -6,6 +6,7 @@ import Drivers from './views/Drivers';
 import DriverModal from './components/DriverModal';
 import Financing from './views/Financing'; // Keep your existing full view
 import TruckCard from './components/TruckCard';
+import Chatbot from './components/ChatBot';
 
 // --- TYPES ---
 interface Truck {
@@ -406,6 +407,7 @@ useEffect(() => {
   {view === 'financing' && <Financing />}
 
 {isModalOpen && <DriverModal onClose={() => setIsModalOpen(false)} />}
+  <Chatbot />
     </div>
   );
 };

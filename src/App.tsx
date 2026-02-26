@@ -573,19 +573,6 @@ const getHomepageGridStyle = (isMobile: boolean): React.CSSProperties => ({
   gap: '20px',
 });
 
-const miniCard: React.CSSProperties = {
-  backgroundColor: '#fff',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-  border: '1px solid #e0e0e0'
-};
-
-const miniImageContainer: React.CSSProperties = {
-  width: '100%',
-  height: '160px',
-  position: 'relative'
-};
 
 const filterCard: React.CSSProperties = {
   backgroundColor: '#fff',
@@ -616,17 +603,6 @@ const filterInput: React.CSSProperties = {
   border: '1px solid #ccc'
 };
 
-const miniBadge: React.CSSProperties = {
-  position: 'absolute',
-  top: '10px',
-  right: '10px',
-  backgroundColor: '#F28C28',
-  color: 'white',
-  padding: '2px 8px',
-  borderRadius: '4px',
-  fontSize: '10px',
-  fontWeight: 'bold'
-};
 
 const viewAllBtn: React.CSSProperties = {
     marginTop: '30px',
@@ -640,9 +616,5 @@ const viewAllBtn: React.CSSProperties = {
     borderRadius: '8px'
 };
 
-// ... Utility styles from previous code
-const imgStyle: React.CSSProperties = { width: '100%', height: '100%', objectFit: 'cover' };
-const heroSlantWhite: React.CSSProperties = { position: 'absolute', bottom: 0, left: 0, width: '100%', height: '80px', backgroundColor: '#f4f4f4', clipPath: 'polygon(0 100%, 100% 100%, 100% 0)', zIndex: 1 };
-const heroSlantYellow: React.CSSProperties = { position: 'absolute', bottom: 0, right: 0, width: '50%', height: '100px', backgroundColor: '#FFD200', clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)', zIndex: 0, opacity: 0.6 };
 
 export default App;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import TruckCard from '../components/TruckCard';
 
 interface Truck {
   id: number;

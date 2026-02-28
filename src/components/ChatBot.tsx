@@ -21,8 +21,35 @@ const ChatBot: React.FC = () => {
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (isOpen) {
+      scrollToBottom();
+    }
   }, [messages, isOpen]);
+
+  const getBotResponse = (userMessage: string): string => {
+    const lowerCaseMessage = userMessage.toLowerCase();
+
+    if (lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi')) {
+      return "Hello there! How can I assist you with our trucks today?";
+    }
+    if (lowerCaseMessage.includes('financing') || lowerCaseMessage.includes('payment')) {
+      return "We offer flexible financing options! You can learn more by visiting our 'Financing' page or by calling our sales team at +254 791 790744.";
+    }
+    if (lowerCaseMessage.includes('hours') || lowerCaseMessage.includes('open')) {
+      return "Our business hours are Monday to Friday, 8:00 AM to 6:00 PM, and Saturdays from 9:00 AM to 3:00 PM.";
+    }
+    if (lowerCaseMessage.includes('location') || lowerCaseMessage.includes('address')) {
+      return "You can find us in Nairobi and Mombasa. Our main showroom is located at 123 Industrial Area, Nairobi.";
+    }
+    if (['trucks', 'inventory', 'scania', 'volvo', 'mercedes', 'actros'].some(keyword => lowerCaseMessage.includes(keyword))) {
+      return "It sounds like you're interested in our inventory! You can view all available trucks on our inventory page. What specific model are you looking for?";
+    }
+    if (lowerCaseMessage.includes('thanks') || lowerCaseMessage.includes('thank you')) {
+        return "You're welcome! Is there anything else I can help you with?";
+    }
+    
+    return "Thanks for your message! Our team has been notified. For immediate assistance, please call us at +254 791 790744.";
+  };
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,17 +57,19 @@ const ChatBot: React.FC = () => {
 
     const userMsg: Message = { id: Date.now(), text: inputValue, sender: 'user' };
     setMessages(prev => [...prev, userMsg]);
+    
+    const botResponseText = getBotResponse(inputValue);
     setInputValue('');
 
     // Simulated Bot Response
     setTimeout(() => {
       const botMsg: Message = { 
         id: Date.now() + 1, 
-        text: "Thank you for your message. A representative will be with you shortly.", 
+        text: botResponseText, 
         sender: 'bot' 
       };
       setMessages(prev => [...prev, botMsg]);
-    }, 1000);
+    }, 1200);
   };
 
   return (

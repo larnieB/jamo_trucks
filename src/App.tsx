@@ -7,6 +7,9 @@ import DriverModal from './components/DriverModal';
 import Financing from './views/Financing';
 import TruckCard from './components/TruckCard';
 import Chatbot from './components/ChatBot';
+import jamohLogo from './assets/jamohTruckslogo.png';
+import heroImage1 from './assets/heroImage1.jpg';
+import heroImage2 from './assets/heroImage2.jpg';
 
 // --- TYPES ---
 interface Truck {
@@ -45,12 +48,14 @@ const App: React.FC = () => {
   });
   const [sortBy, setSortBy] = useState('newest');
   const [navScrolled, setNavScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const carouselImages = [
-    "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=1600",
-    "https://images.unsplash.com/photo-1586191582151-f73972d107c4?auto=format&fit=crop&q=80&w=1600",
-    "https://images.unsplash.com/photo-1591768793355-74d758169956?auto=format&fit=crop&q=80&w=1600"
-  ];
+  const carouselImages = [heroImage1, heroImage2];
+
+  const handleLinkClick = (view: ViewState) => {
+    setView(view);
+    setIsMenuOpen(false);
+  };
 
   // AOS init
   useEffect(() => {
@@ -127,13 +132,14 @@ const App: React.FC = () => {
 
       {/* ▬▬▬ 1. TOP UTILITY BAR ▬▬▬ */}
       <div style={utilityBar}>
-        <div style={utilityBarInner}>
-          <span style={utilityLink} onClick={() => setView('drivers')}>Find a Driver</span>
-          <span style={utilityDivider}>|</span>
-          <span style={utilityLink} onClick={() => setIsModalOpen(true)}>Become a Driver</span>
-          <span style={utilityDivider}>|</span>
-          <span style={utilityLink} onClick={() => setView('financing')}>Financing</span>
-          <span style={utilityDivider}>|</span>
+        <div style={getUtilityBarInnerStyle(isMobile)}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <span style={utilityLink} onClick={() => handleLinkClick('drivers')}>Find a Driver</span>
+            <span style={utilityDivider}>|</span>
+            <span style={utilityLink} onClick={() => setIsModalOpen(true)}>Become a Driver</span>
+            <span style={utilityDivider}>|</span>
+            <span style={utilityLink} onClick={() => handleLinkClick('financing')}>Financing</span>
+          </div>
           <span style={{ ...utilityLink, opacity: 0.7, cursor: 'default' }}>
             ✆ +254 791 790744
           </span>
@@ -145,84 +151,92 @@ const App: React.FC = () => {
         ...navBar,
         boxShadow: navScrolled ? '0 4px 30px rgba(0,0,0,0.12)' : '0 1px 0 rgba(0,0,0,0.06)',
       }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          maxWidth: '1300px',
-          margin: '0 auto',
-          padding: isMobile ? '12px 20px' : '0 40px',
-          gap: isMobile ? '12px' : '0',
-          minHeight: isMobile ? 'auto' : '70px',
-        }}>
+        <div style={navBarInner}>
+
           {/* Logo */}
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
-            onClick={() => setView('home')}
-          >
+          <div style={navLogoContainer} onClick={() => handleLinkClick('home')}>
             <img
-              src="http://localhost:8080/jamo_trucks/jamo_trucks/src/assets/jamohTruckslogo.png"
+              src={jamohLogo}
               alt="Jamoh Trucks Logo"
-              style={{ width: isMobile ? '70px' : '90px', height: 'auto', objectFit: 'contain' }}
+              style={{ width: '90px', height: 'auto', objectFit: 'contain' }}
             />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{
-                fontSize: isMobile ? '1.15rem' : '1.5rem',
-                fontWeight: 900,
-                color: RICH_BLACK,
-                textTransform: 'uppercase' as const,
-                letterSpacing: '-1px',
-                lineHeight: 1,
-              }}>
-                Jamoh Trucks
-              </span>
-              <span style={{
-                color: BRAND_ORANGE,
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                textTransform: 'uppercase' as const,
-                letterSpacing: '3px',
-                marginTop: '2px',
-              }}>
-                Sellers Kenya
-              </span>
+              <span style={navLogoText}>Jamoh Trucks</span>
+              <span style={navLogoSubText}>Sellers Kenya</span>
             </div>
           </div>
 
-          {/* Menu */}
-          <div style={{ display: 'flex', gap: isMobile ? '20px' : '30px', alignItems: 'center' }}>
-            {(['home', 'drivers'] as ViewState[]).map((v) => (
-              <span
-                key={v}
-                onClick={() => setView(v)}
-                style={{
-                  ...(view === v ? activeNavLink : navLink),
-                }}
-              >
-                {v === 'home' ? 'Home' : 'Drivers'}
-                {view === v && <span style={navUnderline} />}
-              </span>
-            ))}
+          {/* Desktop Links & CTA */}
+          {!isMobile && (
+            <>
+              {/* Links */}
+              <div style={navLinksContainer}>
+                {(['home', 'drivers'] as ViewState[]).map((v) => (
+                  <span
+                    key={v}
+                    onClick={() => handleLinkClick(v)}
+                    style={{ ...(view === v ? activeNavLink : navLink) }}
+                  >
+                    {v === 'home' ? 'Home' : 'Drivers'}
+                    {view === v && <span style={navUnderline} />}
+                  </span>
+                ))}
+              </div>
 
-            <button
-              onClick={() => setView('list')}
-              style={navCTABtn}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = BRAND_ORANGE;
-                e.currentTarget.style.transform = 'scale(1.04)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = RICH_BLACK;
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <span style={{ color: BRAND_ORANGE, fontSize: '8px', marginRight: '6px', transition: 'color 0.3s' }}>⬤</span>
-              VIEW INVENTORY
-            </button>
-          </div>
+              {/* CTA */}
+              <div style={navCtaContainer}>
+                <button
+                  onClick={() => handleLinkClick('list')}
+                  style={navCTABtn}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = BRAND_ORANGE;
+                    e.currentTarget.style.transform = 'scale(1.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = RICH_BLACK;
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <span style={{ color: BRAND_ORANGE, fontSize: '8px', marginRight: '6px', transition: 'color 0.3s' }}>⬤</span>
+                  VIEW INVENTORY
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Hamburger Toggle */}
+          {isMobile && (
+            <div style={hamburgerIcon} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              <div style={{ ...hamburgerLine, transform: isMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+              <div style={{ ...hamburgerLine, opacity: isMenuOpen ? 0 : 1 }} />
+              <div style={{ ...hamburgerLine, transform: isMenuOpen ? 'rotate(-45deg) translate(7px, -6px)' : 'none' }} />
+            </div>
+          )}
         </div>
       </nav>
+
+      {/* Mobile Menu Drawer */}
+      {isMobile && (
+        <>
+          <div style={{ ...mobileMenuBackdrop, opacity: isMenuOpen ? 1 : 0, pointerEvents: isMenuOpen ? 'auto' : 'none' }} onClick={() => setIsMenuOpen(false)} />
+          <div style={{ ...mobileMenuDrawer, transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)' }}>
+            <div style={{ padding: '80px 30px 30px 30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {(['home', 'drivers', 'financing'] as ViewState[]).map((v) => (
+                <span key={v} onClick={() => handleLinkClick(v)} style={mobileNavLink}>
+                  {v === 'home' ? 'Home' : v.charAt(0).toUpperCase() + v.slice(1)}
+                </span>
+              ))}
+
+              <button
+                onClick={() => handleLinkClick('list')}
+                style={{ ...navCTABtn, width: '100%', marginTop: '20px', justifyContent: 'center' }}
+              >
+                VIEW INVENTORY
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ▬▬▬ HOME VIEW ▬▬▬ */}
       {view === 'home' && (
@@ -246,7 +260,7 @@ const App: React.FC = () => {
             <div style={heroOverlay} />
 
             {/* Content */}
-            <div style={heroContent}>
+            <div style={getHeroContentStyle(isMobile)}>
               <div
                 data-aos="fade-up"
                 data-aos-delay="100"
@@ -275,7 +289,7 @@ const App: React.FC = () => {
                 data-aos-duration="1000"
               >
                 <button
-                  onClick={() => setView('list')}
+                  onClick={() => handleLinkClick('list')}
                   style={heroPrimaryBtn}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'scale(1.06)';
@@ -289,7 +303,7 @@ const App: React.FC = () => {
                   View Inventory →
                 </button>
                 <button
-                  onClick={() => setView('financing')}
+                  onClick={() => handleLinkClick('financing')}
                   style={heroSecondaryBtn}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)';
@@ -432,13 +446,13 @@ const App: React.FC = () => {
                     key={truck.id}
                     truck={truck}
                     baseUrl={BASE_URL}
-                    onClick={() => setView('list')}
+                    onClick={() => handleLinkClick('list')}
                   />
                 ))}
               </div>
 
               <button
-                onClick={() => setView('list')}
+                onClick={() => handleLinkClick('list')}
                 style={viewAllBtn}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = RICH_BLACK;
@@ -474,23 +488,34 @@ const App: React.FC = () => {
 // STYLES — Modern Industrial
 // ═════════════════════════════════════════════
 
+const getUtilityBarInnerStyle = (isMobile: boolean): React.CSSProperties => ({
+  maxWidth: '1300px',
+  margin: '0 auto',
+  display: 'flex',
+  justifyContent: isMobile ? 'space-around' : 'flex-end',
+  alignItems: 'center',
+  gap: '12px',
+});
+
+const getHeroContentStyle = (isMobile: boolean): React.CSSProperties => ({
+  position: 'relative',
+  zIndex: 2,
+  maxWidth: '1300px',
+  margin: '0 auto',
+  padding: isMobile ? '0 20px' : '0 40px',
+  width: '100%',
+  color: 'white',
+  textAlign: isMobile ? 'center' : 'left',
+});
+
 // --- Utility Bar ---
 const utilityBar: React.CSSProperties = {
   backgroundColor: RICH_BLACK,
   color: 'rgba(255,255,255,0.7)',
-  padding: '6px 40px',
+  padding: '8px 20px',
   fontSize: '11px',
   fontWeight: 500,
   letterSpacing: '0.5px',
-};
-
-const utilityBarInner: React.CSSProperties = {
-  maxWidth: '1300px',
-  margin: '0 auto',
-  display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  gap: '12px',
 };
 
 const utilityLink: React.CSSProperties = {
@@ -499,6 +524,7 @@ const utilityLink: React.CSSProperties = {
   transition: 'color 0.25s ease',
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
+  whiteSpace: 'nowrap',
 };
 
 const utilityDivider: React.CSSProperties = {
@@ -516,6 +542,51 @@ const navBar: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(16px)',
   borderBottom: `2px solid ${BRAND_ORANGE}`,
   transition: 'box-shadow 0.3s ease',
+  height: '70px',
+};
+
+const navBarInner: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  maxWidth: '1300px',
+  height: '100%',
+  margin: '0 auto',
+  padding: '0 20px',
+};
+
+const navLogoContainer: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '14px',
+  cursor: 'pointer',
+  flexShrink: 0,
+};
+
+const navLogoText: React.CSSProperties = {
+  fontSize: '1.5rem',
+  fontWeight: 900,
+  color: RICH_BLACK,
+  textTransform: 'uppercase',
+  letterSpacing: '-1px',
+  lineHeight: 1,
+};
+
+const navLogoSubText: React.CSSProperties = {
+  color: BRAND_ORANGE,
+  fontSize: '0.65rem',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '3px',
+  marginTop: '2px',
+};
+
+const navLinksContainer: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '30px',
+  width: '100%',
 };
 
 const navLink: React.CSSProperties = {
@@ -526,7 +597,7 @@ const navLink: React.CSSProperties = {
   textTransform: 'uppercase',
   letterSpacing: '1px',
   position: 'relative',
-  paddingBottom: '4px',
+  padding: '26px 4px',
   transition: 'color 0.3s ease',
 };
 
@@ -545,6 +616,12 @@ const navUnderline: React.CSSProperties = {
   borderRadius: '2px',
 };
 
+const navCtaContainer: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+  flexShrink: 0,
+};
+
 const navCTABtn: React.CSSProperties = {
   backgroundColor: RICH_BLACK,
   color: '#fff',
@@ -559,6 +636,60 @@ const navCTABtn: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+};
+
+// --- Mobile Menu / Hamburger ---
+const hamburgerIcon: React.CSSProperties = {
+  width: '24px',
+  height: '20px',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  cursor: 'pointer',
+  zIndex: 1101, // Higher than drawer
+};
+
+const hamburgerLine: React.CSSProperties = {
+  width: '100%',
+  height: '3px',
+  backgroundColor: RICH_BLACK,
+  borderRadius: '2px',
+  transition: 'all 0.3s ease',
+};
+
+const mobileMenuBackdrop: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  zIndex: 1050,
+  transition: 'opacity 0.3s ease',
+};
+
+const mobileMenuDrawer: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  right: 0,
+  width: '280px',
+  height: '100%',
+  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  zIndex: 1100,
+  boxShadow: '-10px 0 30px rgba(0,0,0,0.15)',
+  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+};
+
+const mobileNavLink: React.CSSProperties = {
+  ...navLink,
+  color: RICH_BLACK,
+  fontSize: '1.1rem',
+  fontWeight: 800,
+  padding: '12px 15px',
+  borderRadius: '6px',
+  transition: 'background-color 0.2s ease, color 0.2s ease',
 };
 
 // --- Hero ---
@@ -600,16 +731,6 @@ const heroOverlay: React.CSSProperties = {
     rgba(0,0,0,0.05) 100%
   )`,
   zIndex: 1,
-};
-
-const heroContent: React.CSSProperties = {
-  position: 'relative',
-  zIndex: 2,
-  maxWidth: '1300px',
-  margin: '0 auto',
-  padding: '0 40px',
-  width: '100%',
-  color: 'white',
 };
 
 const heroEyebrow: React.CSSProperties = {
